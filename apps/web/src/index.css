@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-deep-purple: #0f0c29;
+
+  --color-blob-purple: #7f5af0;
+  --color-blob-green: #2cb67d;
+
+  --color-glass: rgba(255, 255, 255, 0.07);
+  --color-glass-border: rgba(255, 255, 255, 0.15);
+  --color-glass-hover: rgba(255, 255, 255, 0.1);
+  --color-glass-active: rgba(255, 255, 255, 0.15);
+}

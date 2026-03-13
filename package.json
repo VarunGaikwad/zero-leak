@@ -1,0 +1,9 @@
+{
+  "name": "zero-leak",
+  "private": true,
+  "scripts": {
+    "dev:api": "pnpm --filter @zeroleak/api dev",
+    "dev:web": "pnpm --filter @zeroleak/web dev",
+    "dev": "pnpm --filter \"@zeroleak/*\" --parallel dev"
+  }
+}
