@@ -35,25 +35,55 @@ export const MENU: MenuType[] = [
 
 export const CURRENCY = ["¥", "$", "€"];
 
-export const CATEGORY_ICON = [
-  { title: "Grocery", Icon: ShoppingCart },
-  { title: "Transport", Icon: Train },
-  { title: "Entertainment", Icon: Tv },
-  { title: "Food", Icon: UtensilsCrossed },
-  { title: "Health", Icon: HeartPulse },
-  { title: "Dining", Icon: Coffee },
-  { title: "Shopping", Icon: ShoppingBag },
-  { title: "Income", Icon: TrendingUp },
-  { title: "Utilities", Icon: Zap },
-  { title: "Rent", Icon: Home },
-  { title: "Travel", Icon: Plane },
-  { title: "Education", Icon: BookOpen },
-  { title: "Gym", Icon: Dumbbell },
-  { title: "Gifts", Icon: Gift },
-  { title: "Snacks", Icon: Coffee },
-  { title: "Fuel", Icon: Car },
-  { title: "Internet", Icon: Wifi },
-  { title: "Wallet", Icon: Wallet },
+export const CATEGORY = [
+  {
+    title: "Grocery",
+    Icon: ShoppingCart,
+    numberOfTransaction: 0,
+    type: "Expense",
+  },
+  { title: "Transport", Icon: Train, numberOfTransaction: 0, type: "Expense" },
+  { title: "Entertainment", Icon: Tv, numberOfTransaction: 0, type: "Expense" },
+  {
+    title: "Food",
+    Icon: UtensilsCrossed,
+    numberOfTransaction: 0,
+    type: "Expense",
+  },
+  {
+    title: "Health",
+    Icon: HeartPulse,
+    numberOfTransaction: 0,
+    type: "Expense",
+  },
+  { title: "Dining", Icon: Coffee, numberOfTransaction: 0, type: "Expense" },
+  {
+    title: "Shopping",
+    Icon: ShoppingBag,
+    numberOfTransaction: 0,
+    type: "Expense",
+  },
+  {
+    title: "Income",
+    Icon: TrendingUp,
+    numberOfTransaction: 0,
+    type: "Expense",
+  },
+  { title: "Utilities", Icon: Zap, numberOfTransaction: 0, type: "Expense" },
+  { title: "Rent", Icon: Home, numberOfTransaction: 0, type: "Expense" },
+  { title: "Travel", Icon: Plane, numberOfTransaction: 0, type: "Expense" },
+  {
+    title: "Education",
+    Icon: BookOpen,
+    numberOfTransaction: 0,
+    type: "Expense",
+  },
+  { title: "Gym", Icon: Dumbbell, numberOfTransaction: 0, type: "Expense" },
+  { title: "Gifts", Icon: Gift, numberOfTransaction: 0, type: "Expense" },
+  { title: "Snacks", Icon: Coffee, numberOfTransaction: 0, type: "Expense" },
+  { title: "Fuel", Icon: Car, numberOfTransaction: 0, type: "Expense" },
+  { title: "Internet", Icon: Wifi, numberOfTransaction: 0, type: "Expense" },
+  { title: "Wallet", Icon: Wallet, numberOfTransaction: 0, type: "Expense" },
 ];
 
 export const HOME_PAGE_MOCK_DATA = {

@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp, NotepadText, type LucideIcon } from "lucide-react";
 import { useState } from "react";
-import { CATEGORY_ICON } from "../constant";
+import { CATEGORY } from "../constant";
 
 export default function TransactionItem({
   title,
@@ -15,7 +15,7 @@ export default function TransactionItem({
 }) {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const Icon = CATEGORY_ICON.find(
+  const Icon = CATEGORY.find(
     ({ title }) => title === category.find(({ isMain }) => isMain)?.title,
   )?.Icon as LucideIcon;
 
