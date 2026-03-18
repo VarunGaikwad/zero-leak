@@ -1,5 +1,4 @@
 import express from "express";
-import { User } from "@zeroleak/types";
 import cors from "cors";
 
 const app = express();
@@ -12,7 +11,7 @@ app.use(
 );
 
 app.get("/api/user", (req, res) => {
-  const user: User = {
+  const user = {
     id: "1",
     email: "test@example.com",
   };

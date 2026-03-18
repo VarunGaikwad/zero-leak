@@ -1,7 +1,8 @@
 import { BudgetItem } from "@zeroleak/package/web/components";
 import { BUDGET } from "@zeroleak/package/web/constant";
 import { ListPlus } from "lucide-react";
-export default function Budget() {
+
+export default function Category() {
   return (
     <div className="w-full space-y-5">
       <div className="font-semibold text-2xl">Budget</div>

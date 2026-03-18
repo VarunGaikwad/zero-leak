@@ -1,0 +1,310 @@
+import type { MenuType } from "../types";
+import {
+  Banknote,
+  CalendarSync,
+  Home as HomeLucideIcon,
+  Landmark,
+  Layers2,
+  Wallet,
+  ShoppingCart,
+  Train,
+  Tv,
+  UtensilsCrossed,
+  HeartPulse,
+  Coffee,
+  ShoppingBag,
+  TrendingUp,
+  Zap,
+  Home,
+  Plane,
+  BookOpen,
+  Dumbbell,
+  Gift,
+  Car,
+  Wifi,
+} from "lucide-react";
+
+export const MENU: MenuType[] = [
+  { title: "Home", Icon: HomeLucideIcon, link: "/home" },
+  { title: "Transaction", Icon: Banknote, link: "/transaction" },
+  { title: "Category", Icon: Layers2, link: "/category" },
+  { title: "Budget", Icon: Wallet, link: "/budget" },
+  { title: "Subscriptions", Icon: CalendarSync, link: "/subscription" },
+  { title: "Accounts", Icon: Landmark, link: "/account" },
+];
+
+export const CURRENCY = ["¥", "$", "€"];
+
+export const CATEGORY_ICON = [
+  { title: "Grocery", Icon: ShoppingCart },
+  { title: "Transport", Icon: Train },
+  { title: "Entertainment", Icon: Tv },
+  { title: "Food", Icon: UtensilsCrossed },
+  { title: "Health", Icon: HeartPulse },
+  { title: "Dining", Icon: Coffee },
+  { title: "Shopping", Icon: ShoppingBag },
+  { title: "Income", Icon: TrendingUp },
+  { title: "Utilities", Icon: Zap },
+  { title: "Rent", Icon: Home },
+  { title: "Travel", Icon: Plane },
+  { title: "Education", Icon: BookOpen },
+  { title: "Gym", Icon: Dumbbell },
+  { title: "Gifts", Icon: Gift },
+  { title: "Snacks", Icon: Coffee },
+  { title: "Fuel", Icon: Car },
+  { title: "Internet", Icon: Wifi },
+  { title: "Wallet", Icon: Wallet },
+];
+
+export const HOME_PAGE_MOCK_DATA = {
+  ACCOUNT: [
+    {
+      title: "MUFG Bank",
+      balance: "280,000",
+      currency: "¥",
+      totalTransaction: 12,
+    },
+    { title: "Cash", balance: "15,000", currency: "¥", totalTransaction: 5 },
+    { title: "Suica", balance: "3,200", currency: "¥", totalTransaction: 8 },
+    { title: "PayPay", balance: "8,500", currency: "¥", totalTransaction: 15 },
+    { title: "Rakuten", balance: "52,000", currency: "¥", totalTransaction: 7 },
+    {
+      title: "7-Eleven ATM",
+      balance: "20,000",
+      currency: "¥",
+      totalTransaction: 3,
+    },
+  ],
+  BUDGET: [
+    { title: "Grocery", spendAmount: 7200, totalAmount: 15000, currency: "¥" },
+    { title: "Transport", spendAmount: 3100, totalAmount: 5000, currency: "¥" },
+    { title: "Dining", spendAmount: 9800, totalAmount: 8000, currency: "¥" },
+    {
+      title: "Utilities",
+      spendAmount: 4500,
+      totalAmount: 10000,
+      currency: "¥",
+    },
+    { title: "Health", spendAmount: 7000, totalAmount: 10000, currency: "¥" },
+    {
+      title: "Shopping",
+      spendAmount: 12000,
+      totalAmount: 20000,
+      currency: "¥",
+    },
+    {
+      title: "Entertainment",
+      spendAmount: 2800,
+      totalAmount: 5000,
+      currency: "¥",
+    },
+  ],
+  TRANSACTION: [
+    {
+      title: "FamilyMart",
+      category: [
+        { title: "Grocery", isMain: true },
+        { title: "Snacks", isMain: false },
+      ],
+      note: "Morning coffee and onigiri",
+      amount: -680,
+      datetime: new Date(),
+    },
+    {
+      title: "Suica Recharge",
+      category: [{ title: "Transport", isMain: true }],
+      note: "Monthly top-up",
+      amount: -3000,
+      datetime: new Date(),
+    },
+    {
+      title: "Salary — March",
+      category: [{ title: "Income", isMain: true }],
+      note: "Monthly salary deposit",
+      amount: 280000,
+      datetime: new Date(),
+    },
+    {
+      title: "Sukiya",
+      category: [
+        { title: "Dining", isMain: true },
+        { title: "Lunch", isMain: false },
+      ],
+      note: "Gyudon set",
+      amount: -490,
+      datetime: new Date(Date.now() - 1000 * 60 * 60 * 3),
+    },
+    {
+      title: "Amazon JP",
+      category: [{ title: "Shopping", isMain: true }],
+      note: "USB-C cable",
+      amount: -1280,
+      datetime: new Date("2026-03-17"),
+    },
+    {
+      title: "Electricity Bill",
+      category: [{ title: "Utilities", isMain: true }],
+      note: "February billing cycle",
+      amount: -4500,
+      datetime: new Date("2026-03-17"),
+    },
+    {
+      title: "Netflix",
+      category: [{ title: "Entertainment", isMain: true }],
+      note: "Monthly subscription",
+      amount: -1490,
+      datetime: new Date("2026-03-17"),
+    },
+    {
+      title: "Lawson",
+      category: [
+        { title: "Grocery", isMain: true },
+        { title: "Snacks", isMain: false },
+      ],
+      note: "Late night snacks",
+      amount: -430,
+      datetime: new Date("2026-03-16"),
+    },
+    {
+      title: "Freelance Payment",
+      category: [{ title: "Income", isMain: true }],
+      note: "Logo design project",
+      amount: 35000,
+      datetime: new Date("2026-03-16"),
+    },
+    {
+      title: "Uniqlo",
+      category: [{ title: "Shopping", isMain: true }],
+      note: "Spring jacket",
+      amount: -5990,
+      datetime: new Date("2026-03-16"),
+    },
+    {
+      title: "Shinjuku Gym",
+      category: [{ title: "Health", isMain: true }],
+      note: "Monthly membership",
+      amount: -7000,
+      datetime: new Date("2026-03-15"),
+    },
+    {
+      title: "Ramen Ichiran",
+      category: [
+        { title: "Dining", isMain: true },
+        { title: "Dinner", isMain: false },
+      ],
+      note: "Solo dinner, extra chashu",
+      amount: -1200,
+      datetime: new Date("2026-03-15"),
+    },
+    {
+      title: "Docomo Bill",
+      category: [{ title: "Utilities", isMain: true }],
+      note: "Mobile plan",
+      amount: -3278,
+      datetime: new Date("2026-03-15"),
+    },
+    {
+      title: "Matsuya",
+      category: [
+        { title: "Dining", isMain: true },
+        { title: "Breakfast", isMain: false },
+      ],
+      note: "Morning teishoku",
+      amount: -380,
+      datetime: new Date("2026-03-14"),
+    },
+    {
+      title: "Book Off",
+      category: [{ title: "Shopping", isMain: true }],
+      note: "Used manga volumes",
+      amount: -1500,
+      datetime: new Date("2026-03-14"),
+    },
+    {
+      title: "Sold — Old Laptop",
+      category: [{ title: "Income", isMain: true }],
+      note: "Mercari sale",
+      amount: 18000,
+      datetime: new Date("2026-03-14"),
+    },
+    {
+      title: "Welcia Pharmacy",
+      category: [
+        { title: "Health", isMain: true },
+        { title: "Grocery", isMain: false },
+      ],
+      note: "Cold medicine + vitamins",
+      amount: -2340,
+      datetime: new Date("2026-03-13"),
+    },
+    {
+      title: "JR Pass",
+      category: [{ title: "Transport", isMain: true }],
+      note: "Weekend trip to Kamakura",
+      amount: -1520,
+      datetime: new Date("2026-03-13"),
+    },
+    {
+      title: "Spotify",
+      category: [{ title: "Entertainment", isMain: true }],
+      note: "Monthly subscription",
+      amount: -980,
+      datetime: new Date("2026-03-12"),
+    },
+    {
+      title: "7-Eleven",
+      category: [
+        { title: "Grocery", isMain: true },
+        { title: "Snacks", isMain: false },
+      ],
+      note: "ATM + coffee",
+      amount: -340,
+      datetime: new Date("2026-03-12"),
+    },
+  ],
+};
+
+export const TRANSACTION = [
+  {
+    title: "FamilyMart",
+    category: [
+      { title: "Grocery", isMain: true },
+      { title: "Snacks", isMain: false },
+    ],
+    note: "Morning coffee and onigiri",
+    amount: -680,
+    datetime: new Date("2026-03-12"),
+  },
+  {
+    title: "Spotify",
+    category: [{ title: "Entertainment", isMain: true }],
+    note: "Monthly subscription",
+    amount: -980,
+    datetime: new Date(),
+  },
+];
+
+export const BUDGET = [
+  { title: "Grocery", spendAmount: 7200, totalAmount: 15000, currency: "¥" },
+  { title: "Transport", spendAmount: 3100, totalAmount: 5000, currency: "¥" },
+  { title: "Dining", spendAmount: 9800, totalAmount: 8000, currency: "¥" },
+  {
+    title: "Utilities",
+    spendAmount: 4500,
+    totalAmount: 10000,
+    currency: "¥",
+  },
+  { title: "Health", spendAmount: 7000, totalAmount: 10000, currency: "¥" },
+  {
+    title: "Shopping",
+    spendAmount: 12000,
+    totalAmount: 20000,
+    currency: "¥",
+  },
+  {
+    title: "Entertainment",
+    spendAmount: 2800,
+    totalAmount: 5000,
+    currency: "¥",
+  },
+];
