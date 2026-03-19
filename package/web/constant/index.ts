@@ -338,3 +338,66 @@ export const BUDGET = [
     currency: "¥",
   },
 ];
+
+export const MOCK_SUBSCRIPTIONS = [
+  {
+    id: "sub-1",
+    name: "Netflix",
+    repeatNumber: 1,
+    repeatUnit: "month",
+    amount: 15,
+    untilDate: new Date(2030, 1, 1),
+    upcomingPayDate: new Date(2026, 2, 19), // today
+    icon: ShoppingBag,
+  },
+  {
+    id: "sub-2",
+    name: "Spotify",
+    repeatNumber: 1,
+    repeatUnit: "year",
+    amount: 99,
+    untilDate: new Date(2030, 1, 1),
+    upcomingPayDate: new Date(2026, 2, 20, 23, 59, 59), // tomorrow
+    icon: ShoppingBag,
+  },
+  {
+    id: "sub-3",
+    name: "Gym",
+    repeatNumber: 1,
+    repeatUnit: "week",
+    amount: 12,
+    untilDate: new Date(2030, 1, 1),
+    upcomingPayDate: new Date(2026, 2, 18, 23, 59, 59), // yesterday
+    icon: ShoppingBag,
+  },
+  {
+    id: "sub-4",
+    name: "Coffee App",
+    repeatNumber: 1,
+    repeatUnit: "day",
+    amount: 3,
+    untilDate: new Date(2030, 1, 1),
+    upcomingPayDate: new Date(2026, 2, 19, 23, 59, 59), // today
+    icon: ShoppingBag,
+  },
+  {
+    id: "sub-5",
+    name: "AWS",
+    repeatNumber: 1,
+    repeatUnit: "month",
+    amount: 120,
+    untilDate: new Date(2030, 1, 1),
+    upcomingPayDate: new Date(2026, 3, 1, 23, 59, 59),
+    icon: ShoppingBag,
+  },
+  {
+    id: "sub-6",
+    name: "Adobe",
+    repeatNumber: 1,
+    repeatUnit: "year",
+    amount: 600,
+    untilDate: new Date(2030, 1, 1),
+    upcomingPayDate: new Date(2026, 5, 15, 23, 59, 59),
+    icon: ShoppingBag,
+  },
+];
