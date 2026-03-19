@@ -17,13 +17,13 @@ export default function CategoryItem({
         <Icon className="text-white size-5" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-semibold text-gray-900 truncate">{title}</div>
-        <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mt-0.5">
+        <p className="font-semibold text-gray-900 truncate">{title}</p>
+        <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mt-0.5">
           {type}
-        </div>
-        <div className="text-sm text-gray-400 mt-1 truncate">
+        </p>
+        <p className="text-sm text-gray-400 mt-1 truncate">
           {numberOfTransaction} transaction{numberOfTransaction !== 1 && "s"}
-        </div>
+        </p>
       </div>
       <button
         className="shrink-0 p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"

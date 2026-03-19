@@ -96,12 +96,12 @@ export default function Dashboard() {
 
           {menuIsOpen && (
             <div className="text-center font-extrabold text-black">
-              <div className="text-4xl tracking-wide">
+              <time className="text-4xl tracking-wide">
                 {displayHours}:{displayMinutes}
                 <span className="text-xl"> {ampm}</span>
-              </div>
-              <div className="">{dayName}</div>
-              <div className="">{dateStr}</div>
+              </time>
+              <p className="">{dayName}</p>
+              <p className="">{dateStr}</p>
             </div>
           )}
 

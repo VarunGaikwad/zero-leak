@@ -11,12 +11,22 @@ import {
   Subscriptions,
   Accounts,
 } from "./pages";
+import Login from "./Login.tsx";
+import ProtectedRoute from "./ProtectedRoute.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Dashboard />}>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        >
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="home" element={<Home />} />
           <Route path="budget" element={<Budget />} />

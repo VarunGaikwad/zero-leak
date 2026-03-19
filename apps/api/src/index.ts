@@ -1,23 +1,24 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import router from "./routes/index.js";
+
+dotenv.config();
 
 const app = express();
-const port = 3001;
+
+app.use(express.json());
+
+app.use(cookieParser());
 
 app.use(
   cors({
     origin: "http://localhost:2312",
+    credentials: true,
   }),
 );
 
-app.get("/api/user", (req, res) => {
-  const user = {
-    id: "1",
-    email: "test@example.com",
-  };
-  res.json(user);
-});
+app.use("/api", router);
 
-app.listen(port, () => {
-  console.log(`API listening at http://localhost:${port}`);
-});
+app.listen(3000, () => console.log("Running on 3000"));

@@ -1,5 +1,5 @@
 import { TransactionItem } from "@zeroleak/package/web/components";
-import { HOME_PAGE_MOCK_DATA } from "@zeroleak/package/web/constant";
+import { MOCK_DATA } from "@zeroleak/package/web/constant";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 function getDateLabel(date: Date): string {
@@ -17,8 +17,8 @@ function getDateLabel(date: Date): string {
   });
 }
 
-function groupByDate(transactions: typeof HOME_PAGE_MOCK_DATA.TRANSACTION) {
-  const groups: Record<string, typeof HOME_PAGE_MOCK_DATA.TRANSACTION> = {};
+function groupByDate(transactions: typeof MOCK_DATA.TRANSACTION) {
+  const groups: Record<string, typeof MOCK_DATA.TRANSACTION> = {};
 
   for (const tx of transactions) {
     const label = getDateLabel(new Date(tx.datetime));
@@ -29,7 +29,7 @@ function groupByDate(transactions: typeof HOME_PAGE_MOCK_DATA.TRANSACTION) {
   return groups;
 }
 
-function getMonthRange(transactions: typeof HOME_PAGE_MOCK_DATA.TRANSACTION) {
+function getMonthRange(transactions: typeof MOCK_DATA.TRANSACTION) {
   const now = new Date();
   const nineMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 9, 1);
 
@@ -74,7 +74,7 @@ const MONTH_NAMES = [
 ];
 
 export default function Transaction() {
-  const months = getMonthRange(HOME_PAGE_MOCK_DATA.TRANSACTION);
+  const months = getMonthRange(MOCK_DATA.TRANSACTION);
   const now = new Date();
 
   const [selected, setSelected] = useState({
@@ -112,7 +112,7 @@ export default function Transaction() {
     });
   }, [selected]);
 
-  const filteredTransactions = HOME_PAGE_MOCK_DATA.TRANSACTION.filter((tx) => {
+  const filteredTransactions = MOCK_DATA.TRANSACTION.filter((tx) => {
     const d = new Date(tx.datetime);
     return d.getMonth() === selected.month && d.getFullYear() === selected.year;
   });
@@ -133,7 +133,7 @@ export default function Transaction() {
     <div className="w-full relative min-h-screen pb-20">
       {/* Sticky header area */}
       <div className="sticky -top-4 -mx-4 -mt-4 px-4 pt-4 bg-white z-10 pb-4 border-b">
-        <div className="font-semibold text-2xl mb-4">Transactions</div>
+        <h1 className="font-semibold text-2xl mb-4">Transactions</h1>
         <div
           ref={scrollRef}
           className="flex gap-1 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [scrollbar-width:none] snap-x snap-mandatory"
@@ -141,7 +141,8 @@ export default function Transaction() {
           <div ref={leftSpacerRef} className="shrink-0" />
 
           {months.map(({ month, year }) => {
-            const isSelected = selected.month === month && selected.year === year;
+            const isSelected =
+              selected.month === month && selected.year === year;
             const isCurrentMonth =
               now.getMonth() === month && now.getFullYear() === year;
 
@@ -154,11 +155,17 @@ export default function Transaction() {
                   isSelected ? "bg-black text-white" : "hover:bg-gray-100"
                 }`}
               >
-                <span className="text-sm font-medium">{MONTH_NAMES[month]}</span>
+                <span className="text-sm font-medium">
+                  {MONTH_NAMES[month]}
+                </span>
                 <span
                   className={`text-xs ${isSelected ? "text-white/70" : "text-gray-400"}`}
                 >
-                  {isCurrentMonth ? "●" : now.getFullYear() !== year ? year : ""}
+                  {isCurrentMonth
+                    ? "●"
+                    : now.getFullYear() !== year
+                      ? year
+                      : ""}
                 </span>
               </button>
             );
@@ -197,23 +204,23 @@ export default function Transaction() {
       {/* Transactions */}
       <div className="flex flex-col gap-6 mt-6">
         {filteredTransactions.length === 0 ? (
-          <div className="text-sm text-gray-400 text-center py-12 flex flex-col items-center gap-2">
+          <p className="text-sm text-gray-400 text-center py-12 flex flex-col items-center gap-2">
             <span className="text-4xl text-gray-200">∅</span>
             No transactions for this month
-          </div>
+          </p>
         ) : (
           Object.entries(grouped).map(([label, transactions]) => (
-            <div key={label} className="flex flex-col gap-3">
-              <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest pl-1">
+            <section key={label} className="flex flex-col gap-3">
+              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest pl-1">
                 {label}
-              </span>
+              </h2>
               <div className="flex flex-col gap-3">
                 {transactions.map((tx) => (
                   <TransactionItem key={tx.title} {...tx} />
                 ))}
               </div>
               <div className="h-px w-full bg-gray-100 mt-2" />
-            </div>
+            </section>
           ))
         )}
       </div>

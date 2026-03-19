@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp, NotepadText, type LucideIcon } from "lucide-react";
 import { useState } from "react";
-import { CATEGORY } from "../constant";
+import { MOCK_DATA } from "../constant";
 
 export default function TransactionItem({
   title,
@@ -15,7 +15,7 @@ export default function TransactionItem({
 }) {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const Icon = CATEGORY.find(
+  const Icon = MOCK_DATA.CATEGORY.find(
     ({ title }) => title === category.find(({ isMain }) => isMain)?.title,
   )?.Icon as LucideIcon;
 
@@ -25,7 +25,7 @@ export default function TransactionItem({
         <Icon className="size-5 text-white" />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-black font-medium truncate">{title}</div>
+        <p className="text-black font-medium truncate">{title}</p>
         <div className="text-xs flex gap-1 mt-0.5">
           {category.map(({ title }) => (
             <span
@@ -53,7 +53,7 @@ export default function TransactionItem({
             )}
           </div>
         )}
-        <div
+        <span
           className={`flex items-center ${amount >= 0 ? "text-green-500" : "text-red-500"}`}
         >
           {amount >= 0 ? (
@@ -62,7 +62,7 @@ export default function TransactionItem({
             <ArrowDown className="size-5" />
           )}
           <span className="font-semibold">${Math.abs(amount)}</span>
-        </div>
+        </span>
       </div>
     </div>
   );

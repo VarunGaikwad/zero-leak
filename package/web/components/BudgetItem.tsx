@@ -22,8 +22,8 @@ export default function BudgetItem({
 
   return (
     <div className="border rounded-xl py-3 px-5 shrink-0 snap-start min-w-48 flex flex-col gap-2">
-      <div className="font-semibold text-sm">{title}</div>
-      <div className="font-bold text-lg">
+      <p className="font-semibold text-sm">{title}</p>
+      <p className="font-bold text-lg">
         {currency}
         {spendAmount.toLocaleString()}{" "}
         <span
@@ -33,7 +33,7 @@ export default function BudgetItem({
             ? `${(spendAmount - totalAmount).toLocaleString()} overspent of ${totalAmount.toLocaleString()}`
             : `${(totalAmount - spendAmount).toLocaleString()} left of ${totalAmount.toLocaleString()}`}
         </span>
-      </div>
+      </p>
       <div className="relative h-2 w-full border rounded-full overflow-hidden">
         <div
           className={`absolute rounded-full left-0 top-0 h-full transition-all ${isOverspent ? "bg-red-400" : "bg-black/75"}`}

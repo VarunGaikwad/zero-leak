@@ -1,45 +1,23 @@
+import { MOCK_DATA } from "@zeroleak/package/web/constant";
 import { ListPlus, Trash } from "lucide-react";
-
-const MOCK_ACCOUNTS = [
-  {
-    id: "acc-1",
-    name: "Bank",
-    balance: 1000,
-    type: "Primary",
-    transactions: 7,
-  },
-  {
-    id: "acc-2",
-    name: "Cash",
-    balance: 350,
-    type: "Secondary",
-    transactions: 3,
-  },
-  {
-    id: "acc-3",
-    name: "Credit",
-    balance: -240,
-    type: "Secondary",
-    transactions: 12,
-  },
-];
 
 export default function Accounts() {
   return (
     <div className="w-full space-y-5">
       <h1 className="font-semibold text-2xl">Accounts</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {MOCK_ACCOUNTS.map((acc) => (
+        {MOCK_DATA.ACCOUNT.map((acc) => (
           <div
-            key={acc.id}
+            key={acc.title}
             className="flex items-stretch rounded-2xl border border-black/10 overflow-hidden"
           >
             <div className="w-1.5 shrink-0 bg-black" />
             <div className="flex flex-1 items-center gap-4 px-4 py-4">
               <div className="flex-1 space-y-1">
-                <p className="font-semibold">{acc.name}</p>
+                <p className="font-semibold">{acc.title}</p>
                 <p className="text-lg font-bold">
-                  {acc.balance < 0 ? "-" : ""}$
+                  {acc.balance < 0 ? "-" : ""}
+                  {acc.currency}
                   {Math.abs(acc.balance).toLocaleString()}
                 </p>
                 <div className="flex items-center gap-3 text-sm">
@@ -47,7 +25,7 @@ export default function Accounts() {
                     {acc.type}
                   </span>
                   <span className="text-black/50">
-                    {acc.transactions} transactions
+                    {acc.totalTransaction} transactions
                   </span>
                 </div>
               </div>

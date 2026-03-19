@@ -15,9 +15,9 @@ export default function StatGrid({
     <div
       className={`border rounded-xl py-3 px-4 flex flex-col items-center gap-1 ${className}`}
     >
-      <div className="text-xs">{title}</div>
-      <div className={`font-bold text-lg ${color}`}>${amount}</div>
-      <div className="text-xs">{totalTransaction} transaction</div>
+      <p className="text-xs">{title}</p>
+      <p className={`font-bold text-lg ${color}`}>${amount}</p>
+      <p className="text-xs">{totalTransaction} transaction</p>
     </div>
   );
 }
