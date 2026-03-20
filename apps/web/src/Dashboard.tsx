@@ -2,12 +2,19 @@ import {
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
+  Plus,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { useContext, useEffect, useRef, useState } from "react";
+import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { MENU } from "@zeroleak/package/web/constant";
-import { Provider } from "./model";
+import { Drawer } from "@zeroleak/package/web/components";
+import AppContext from "./model/context";
+import AddTransactionForm from "./components/forms/AddTransactionForm";
+import AddSubscriptionForm from "./components/forms/AddSubscriptionForm";
+import AddAccountForm from "./components/forms/AddAccountForm";
+import AddCategoryForm from "./components/forms/AddCategoryForm";
+import AddBudgetForm from "./components/forms/AddBudgetForm";
 
 const MOBILE_VISIBLE = 3;
 
@@ -15,7 +22,9 @@ export default function Dashboard() {
   const [menuIsOpen, setMenuIsOpen] = useState(false);
   const [now, setNow] = useState(new Date());
   const [overflowOpen, setOverflowOpen] = useState(false);
+  const { isDrawerOpen, setIsDrawerOpen, editingItem, setEditingItem } = useContext(AppContext)!;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const location = useLocation();
 
   useEffect(() => {
     const tick = () => setNow(new Date());
@@ -46,11 +55,42 @@ export default function Dashboard() {
   const visibleMenu = MENU.slice(0, MOBILE_VISIBLE);
   const overflowMenu = MENU.slice(MOBILE_VISIBLE);
 
+  const handleSuccess = () => {
+    setIsDrawerOpen(false);
+    setEditingItem(null);
+    // Refresh current route to show new data
+    window.location.reload();
+  };
+
+  const getForm = () => {
+    if (location.pathname === "/subscription") {
+      return <AddSubscriptionForm onSuccess={handleSuccess} />;
+    }
+    if (location.pathname === "/account") {
+      return <AddAccountForm onSuccess={handleSuccess} />;
+    }
+    if (location.pathname === "/category") {
+      return <AddCategoryForm onSuccess={handleSuccess} />;
+    }
+    if (location.pathname === "/budget") {
+      return <AddBudgetForm onSuccess={handleSuccess} />;
+    }
+    return <AddTransactionForm onSuccess={handleSuccess} initialData={editingItem} />;
+  };
+
+  const getTitle = () => {
+    const isEdit = !!editingItem;
+    if (location.pathname === "/subscription") return isEdit ? "Edit Subscription" : "Add Subscription";
+    if (location.pathname === "/account") return isEdit ? "Edit Account" : "Add Account";
+    if (location.pathname === "/category") return isEdit ? "Edit Category" : "Add Category";
+    if (location.pathname === "/budget") return isEdit ? "Edit Budget" : "Add Budget";
+    return isEdit ? "Edit Transaction" : "Add Transaction";
+  };
+
   return (
-    <Provider>
+    <>
       <div className="flex flex-col md:flex-row h-svh w-screen bg-white text-black">
         <aside className="hidden md:flex lg:hidden flex-col p-2 space-y-5 border-r w-14 shrink-0">
-
           <div className="space-y-2 mt-4">
             {MENU.map(({ Icon, title, link }) => (
               <NavLink
@@ -145,9 +185,7 @@ export default function Dashboard() {
               key={title}
               className={({ isActive }) =>
                 `${
-                  isActive
-                    ? "bg-black text-white rounded-full"
-                    : "text-black"
+                  isActive ? "bg-black text-white rounded-full" : "text-black"
                 } w-11 h-11 flex items-center justify-center rounded-full transition-all duration-300`
               }
             >
@@ -159,9 +197,7 @@ export default function Dashboard() {
             <button
               onClick={() => setOverflowOpen(!overflowOpen)}
               className={`w-11 h-11 flex items-center justify-center rounded-full transition-all duration-300 ${
-                overflowOpen
-                  ? "bg-black text-white"
-                  : "text-black"
+                overflowOpen ? "bg-black text-white" : "text-black"
               }`}
             >
               {overflowOpen ? <X size={20} /> : <MoreHorizontal size={20} />}
@@ -191,6 +227,32 @@ export default function Dashboard() {
           </div>
         </nav>
       </div>
-    </Provider>
+
+      {["/home", "/transaction", "/subscription", "/account", "/category", "/budget"].indexOf(location.pathname) >
+        -1 && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={() => {
+              setEditingItem(null);
+              setIsDrawerOpen(true);
+            }}
+            className="bg-black text-white p-4 rounded-2xl shadow-lg hover:scale-110 active:scale-95 transition cursor-pointer"
+          >
+            <Plus />
+          </button>
+        </div>
+      )}
+
+      <Drawer
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setEditingItem(null);
+        }}
+        title={getTitle()}
+      >
+        {getForm()}
+      </Drawer>
+    </>
   );
 }

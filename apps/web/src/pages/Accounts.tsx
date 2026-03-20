@@ -1,14 +1,35 @@
-import { MOCK_DATA } from "@zeroleak/package/web/constant";
+import { axiosInstance } from "../lib";
+import { useEffect, useState } from "react";
 import { ListPlus, Trash } from "lucide-react";
 
 export default function Accounts() {
+  const [accounts, setAccounts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axiosInstance
+      .get("/api/v1/accounts")
+      .then((res) => setAccounts(res.data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center py-20">
+        <p className="text-zinc-500 animate-pulse font-medium">
+          Loading accounts...
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full space-y-5">
       <h1 className="font-semibold text-2xl">Accounts</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {MOCK_DATA.ACCOUNT.map((acc) => (
+        {accounts.map((acc) => (
           <div
-            key={acc.title}
+            key={acc.id ?? acc.title}
             className="flex items-stretch rounded-2xl border border-black/10 overflow-hidden"
           >
             <div className="w-1.5 shrink-0 bg-black" />
@@ -29,7 +50,15 @@ export default function Accounts() {
                   </span>
                 </div>
               </div>
-              <button className="p-2 rounded-lg hover:bg-black/5 transition-colors">
+              <button 
+                onClick={async () => {
+                  if (window.confirm(`Are you sure you want to delete "${acc.title}"?`)) {
+                    await axiosInstance.delete(`/api/v1/accounts/${acc.id}`);
+                    setAccounts(prev => prev.filter(a => a.id !== acc.id));
+                  }
+                }}
+                className="p-2 rounded-lg hover:bg-black/5 transition-colors text-gray-400 hover:text-red-500 cursor-pointer"
+              >
                 <Trash className="size-4" />
               </button>
             </div>
@@ -44,3 +73,4 @@ export default function Accounts() {
     </div>
   );
 }
+

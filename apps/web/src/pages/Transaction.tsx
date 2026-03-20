@@ -1,6 +1,7 @@
 import { TransactionItem } from "@zeroleak/package/web/components";
-import { MOCK_DATA } from "@zeroleak/package/web/constant";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { axiosInstance } from "../lib";
+import { useEffect, useLayoutEffect, useRef, useState, useMemo, useContext } from "react";
+import AppContext from "../model/context";
 
 function getDateLabel(date: Date): string {
   const today = new Date();
@@ -17,8 +18,8 @@ function getDateLabel(date: Date): string {
   });
 }
 
-function groupByDate(transactions: typeof MOCK_DATA.TRANSACTION) {
-  const groups: Record<string, typeof MOCK_DATA.TRANSACTION> = {};
+function groupByDate(transactions: any[]) {
+  const groups: Record<string, any[]> = {};
 
   for (const tx of transactions) {
     const label = getDateLabel(new Date(tx.datetime));
@@ -29,7 +30,7 @@ function groupByDate(transactions: typeof MOCK_DATA.TRANSACTION) {
   return groups;
 }
 
-function getMonthRange(transactions: typeof MOCK_DATA.TRANSACTION) {
+function getMonthRange(transactions: any[]) {
   const now = new Date();
   const nineMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 9, 1);
 
@@ -74,13 +75,24 @@ const MONTH_NAMES = [
 ];
 
 export default function Transaction() {
-  const months = getMonthRange(MOCK_DATA.TRANSACTION);
+  const { openDrawerWithData } = useContext(AppContext)!;
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const now = new Date();
 
   const [selected, setSelected] = useState({
     month: now.getMonth(),
     year: now.getFullYear(),
   });
+
+  useEffect(() => {
+    axiosInstance
+      .get("/api/v1/transactions")
+      .then((res) => setTransactions(res.data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const months = useMemo(() => getMonthRange(transactions), [transactions]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const selectedRef = useRef<HTMLButtonElement>(null);
@@ -110,24 +122,44 @@ export default function Transaction() {
       left: itemCenter - containerCenter,
       behavior: isInitial ? "instant" : "smooth",
     });
-  }, [selected]);
+  }, [selected, loading]);
 
-  const filteredTransactions = MOCK_DATA.TRANSACTION.filter((tx) => {
-    const d = new Date(tx.datetime);
-    return d.getMonth() === selected.month && d.getFullYear() === selected.year;
-  });
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((tx) => {
+      const d = new Date(tx.datetime);
+      return (
+        d.getMonth() === selected.month && d.getFullYear() === selected.year
+      );
+    });
+  }, [transactions, selected]);
 
-  const totalExpense = filteredTransactions
-    .filter((tx) => tx.amount < 0)
-    .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+  const totals = useMemo(() => {
+    const totalExpense = filteredTransactions
+      .filter((tx) => tx.amount < 0)
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
 
-  const totalIncome = filteredTransactions
-    .filter((tx) => tx.amount > 0)
-    .reduce((sum, tx) => sum + tx.amount, 0);
+    const totalIncome = filteredTransactions
+      .filter((tx) => tx.amount > 0)
+      .reduce((sum, tx) => sum + tx.amount, 0);
 
-  const netWorth = totalIncome - totalExpense;
+    return { totalExpense, totalIncome, netWorth: totalIncome - totalExpense };
+  }, [filteredTransactions]);
 
-  const grouped = groupByDate(filteredTransactions);
+  const grouped = useMemo(
+    () => groupByDate(filteredTransactions),
+    [filteredTransactions],
+  );
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center py-20">
+        <p className="text-zinc-500 animate-pulse font-medium">
+          Loading transactions...
+        </p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="w-full relative min-h-screen pb-20">
@@ -180,23 +212,23 @@ export default function Transaction() {
         <div className="flex-1 flex flex-col items-center gap-0.5">
           <span className="text-xs text-gray-400">Expense</span>
           <span className="text-sm font-semibold text-red-400">
-            ¥{totalExpense.toLocaleString()}
+            ¥{totals.totalExpense.toLocaleString()}
           </span>
         </div>
         <div className="w-px h-8 bg-gray-200" />
         <div className="flex-1 flex flex-col items-center gap-0.5">
           <span className="text-xs text-gray-400">Income</span>
           <span className="text-sm font-semibold text-green-400">
-            ¥{totalIncome.toLocaleString()}
+            ¥{totals.totalIncome.toLocaleString()}
           </span>
         </div>
         <div className="w-px h-8 bg-gray-200" />
         <div className="flex-1 flex flex-col items-center gap-0.5">
           <span className="text-xs text-gray-400">Net</span>
           <span
-            className={`text-sm font-semibold ${netWorth >= 0 ? "text-green-400" : "text-red-400"}`}
+            className={`text-sm font-semibold ${totals.netWorth >= 0 ? "text-green-400" : "text-red-400"}`}
           >
-            ¥{netWorth.toLocaleString()}
+            ¥{totals.netWorth.toLocaleString()}
           </span>
         </div>
       </div>
@@ -216,7 +248,19 @@ export default function Transaction() {
               </h2>
               <div className="flex flex-col gap-3">
                 {transactions.map((tx) => (
-                  <TransactionItem key={tx.title} {...tx} />
+                  <TransactionItem
+                    key={tx.id}
+                    {...tx}
+                    onClick={() => openDrawerWithData(tx)}
+                    onDelete={async () => {
+                      if (window.confirm(`Delete transaction "${tx.title}"?`)) {
+                        await axiosInstance.delete(`/api/v1/transactions/${tx.id}`);
+                        setTransactions((prev) =>
+                          prev.filter((tr) => tr.id !== tx.id),
+                        );
+                      }
+                    }}
+                  />
                 ))}
               </div>
               <div className="h-px w-full bg-gray-100 mt-2" />

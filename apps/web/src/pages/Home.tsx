@@ -1,12 +1,13 @@
-import { ListPlus } from "lucide-react";
-import { useState } from "react";
+import { ListPlus, HelpCircle } from "lucide-react";
+import * as Icons from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
 import {
   BankAccount,
   BudgetItem,
   TransactionItem,
   StatGrid,
 } from "@zeroleak/package/web/components";
-import { MOCK_DATA } from "@zeroleak/package/web/constant";
+import { axiosInstance } from "../lib";
 
 type Filter = "all" | "expense" | "income";
 
@@ -25,8 +26,8 @@ function getDateLabel(date: Date): string {
   });
 }
 
-function groupByDate(transactions: typeof MOCK_DATA.TRANSACTION) {
-  const groups: Record<string, typeof MOCK_DATA.TRANSACTION> = {};
+function groupByDate(transactions: any[]) {
+  const groups: Record<string, any[]> = {};
 
   for (const tx of transactions) {
     const label = getDateLabel(new Date(tx.datetime));
@@ -51,37 +52,109 @@ function formatRelativeDate(date: Date): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-// Computed once at module level — stable references, no re-sort on render
-const upcomingSubscriptions = [...MOCK_DATA.SUBSCRIPTION]
-  .sort((a, b) => a.upcomingPayDate.getTime() - b.upcomingPayDate.getTime())
-  .slice(0, 3);
-
-const monthlyTotal = MOCK_DATA.SUBSCRIPTION.reduce((sum, sub) => {
-  if (sub.repeatUnit === "month") return sum + sub.amount;
-  if (sub.repeatUnit === "year") return sum + sub.amount / 12;
-  if (sub.repeatUnit === "week") return sum + sub.amount * 4.33;
-  if (sub.repeatUnit === "day") return sum + sub.amount * 30;
-  return sum;
-}, 0);
-
 export default function Home() {
   const [filter, setFilter] = useState<Filter>("all");
-
-  const filteredTransactions = MOCK_DATA.TRANSACTION.filter((tx) => {
-    if (filter === "expense") return tx.amount < 0;
-    if (filter === "income") return tx.amount > 0;
-    return true;
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState<{
+    accounts: any[];
+    budgets: any[];
+    subscriptions: any[];
+    categories: any[];
+    transactions: any[];
+  }>({
+    accounts: [],
+    budgets: [],
+    subscriptions: [],
+    categories: [],
+    transactions: [],
   });
 
-  const grouped = groupByDate(filteredTransactions);
+  useEffect(() => {
+    Promise.all([
+      axiosInstance.get("/api/v1/accounts"),
+      axiosInstance.get("/api/v1/budgets"),
+      axiosInstance.get("/api/v1/subscriptions"),
+      axiosInstance.get("/api/v1/categories"),
+      axiosInstance.get("/api/v1/transactions"),
+    ])
+      .then(([acc, bud, sub, cat, tx]) => {
+        setData({
+          accounts: acc.data,
+          budgets: bud.data,
+          subscriptions: sub.data,
+          categories: cat.data,
+          transactions: tx.data,
+        });
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
-  const totalExpense = MOCK_DATA.TRANSACTION.filter(
-    (tx) => tx.amount < 0,
-  ).reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+  const upcomingSubscriptions = useMemo(() => {
+    return [...data.subscriptions]
+      .sort(
+        (a, b) =>
+          new Date(a.upcomingPayDate).getTime() -
+          new Date(b.upcomingPayDate).getTime(),
+      )
+      .slice(0, 3);
+  }, [data.subscriptions]);
 
-  const totalIncome = MOCK_DATA.TRANSACTION.filter(
-    (tx) => tx.amount > 0,
-  ).reduce((sum, tx) => sum + tx.amount, 0);
+  const monthlyTotal = useMemo(() => {
+    return data.subscriptions.reduce((sum, sub) => {
+      if (sub.repeatUnit === "month") return sum + sub.amount;
+      if (sub.repeatUnit === "year") return sum + sub.amount / 12;
+      if (sub.repeatUnit === "week") return sum + sub.amount * 4.33;
+      if (sub.repeatUnit === "day") return sum + sub.amount * 30;
+      return sum;
+    }, 0);
+  }, [data.subscriptions]);
+
+  const stats = useMemo(() => {
+    const totalExpense = data.transactions
+      .filter((tx) => tx.amount < 0)
+      .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+
+    const totalIncome = data.transactions
+      .filter((tx) => tx.amount > 0)
+      .reduce((sum, tx) => sum + tx.amount, 0);
+
+    return {
+      totalExpense,
+      totalIncome,
+      netWorth: totalIncome - totalExpense,
+      expenseCount: data.transactions.filter((tx) => tx.amount < 0).length,
+      incomeCount: data.transactions.filter((tx) => tx.amount > 0).length,
+    };
+  }, [data.transactions]);
+
+  const filteredTransactions = useMemo(() => {
+    return data.transactions.filter((tx) => {
+      if (filter === "expense") return tx.amount < 0;
+      if (filter === "income") return tx.amount > 0;
+      return true;
+    });
+  }, [data.transactions, filter]);
+
+  const grouped = useMemo(
+    () => groupByDate(filteredTransactions),
+    [filteredTransactions],
+  );
+
+  const getIcon = (name: string) => {
+    return (Icons as any)[name] || HelpCircle;
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center py-20">
+        <p className="text-zinc-500 animate-pulse font-medium">
+          Loading your data...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-5">
@@ -91,8 +164,8 @@ export default function Home() {
       <section>
         <h2 className="font-semibold text-sm mb-2">Accounts</h2>
         <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory px-2">
-          {MOCK_DATA.ACCOUNT.map((options) => (
-            <BankAccount key={options.title} {...options} />
+          {data.accounts.map((options) => (
+            <BankAccount key={options.id ?? options.title} {...options} />
           ))}
           <button className="border border-dashed rounded-xl py-3 px-5 min-w-32 shrink-0 snap-start flex flex-col items-center justify-center gap-1 cursor-pointer">
             <ListPlus size={20} />
@@ -105,8 +178,8 @@ export default function Home() {
       <section>
         <h2 className="font-semibold text-sm mb-2">Budgets</h2>
         <div className="flex gap-4 overflow-x-auto pb-2 snap-x snap-mandatory px-2">
-          {MOCK_DATA.BUDGET.map((options) => (
-            <BudgetItem key={options.title} {...options} />
+          {data.budgets.map((options) => (
+            <BudgetItem key={options.id ?? options.title} {...options} />
           ))}
           <button className="border border-dashed rounded-xl py-3 px-5 min-w-48 shrink-0 snap-start flex flex-col items-center justify-center gap-1 cursor-pointer">
             <ListPlus size={20} />
@@ -125,8 +198,9 @@ export default function Home() {
         </div>
         <div className="flex flex-col gap-2">
           {upcomingSubscriptions.map((sub) => {
-            const IconComponent = sub.icon;
-            const isPast = sub.upcomingPayDate < new Date();
+            const IconComponent = getIcon(sub.icon);
+            const subDate = new Date(sub.upcomingPayDate);
+            const isPast = subDate < new Date();
             return (
               <div
                 key={sub.id}
@@ -143,7 +217,7 @@ export default function Home() {
                       : "bg-black/5 text-black"
                   }`}
                 >
-                  {formatRelativeDate(sub.upcomingPayDate)}
+                  {formatRelativeDate(subDate)}
                 </span>
                 <p className="text-sm font-semibold w-14 text-right">
                   ${sub.amount}
@@ -158,19 +232,22 @@ export default function Home() {
       <section>
         <h2 className="font-semibold text-sm mb-2">Categories</h2>
         <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
-          {MOCK_DATA.CATEGORY.map(({ title, Icon }) => (
-            <button
-              key={title}
-              className="flex flex-col items-center gap-1.5 shrink-0 snap-start cursor-pointer group"
-            >
-              <div className="size-12 rounded-full bg-black flex items-center justify-center group-hover:bg-black/80 transition-colors">
-                <Icon className="size-5 text-white" />
-              </div>
-              <span className="text-xs text-gray-600 w-14 text-center truncate">
-                {title}
-              </span>
-            </button>
-          ))}
+          {data.categories.map(({ title, icon, id }) => {
+            const IconComponent = getIcon(icon);
+            return (
+              <button
+                key={id ?? title}
+                className="flex flex-col items-center gap-1.5 shrink-0 snap-start cursor-pointer group"
+              >
+                <div className="size-12 rounded-full bg-black flex items-center justify-center group-hover:bg-black/80 transition-colors">
+                  <IconComponent className="size-5 text-white" />
+                </div>
+                <span className="text-xs text-gray-600 w-14 text-center truncate">
+                  {title}
+                </span>
+              </button>
+            );
+          })}
           <button className="flex flex-col items-center gap-1.5 shrink-0 snap-start cursor-pointer group">
             <div className="size-12 rounded-full border border-dashed border-black/30 flex items-center justify-center group-hover:bg-gray-50 transition-colors">
               <ListPlus className="size-5 text-black/40" />
@@ -184,33 +261,27 @@ export default function Home() {
       <section>
         <h2 className="font-semibold text-sm mb-3">Overview</h2>
         <div className="flex flex-col md:flex-row w-full gap-4 md:items-start">
-          {/* Stats — fixed, doesn't stretch with transactions */}
           <div className="w-full md:w-1/2 grid grid-cols-2 gap-3">
             <StatGrid
               title="Expense"
               color="text-red-400"
-              amount={totalExpense}
-              totalTransaction={
-                MOCK_DATA.TRANSACTION.filter((tx) => tx.amount < 0).length
-              }
+              amount={stats.totalExpense}
+              totalTransaction={stats.expenseCount}
             />
             <StatGrid
               title="Income"
               color="text-green-400"
-              amount={totalIncome}
-              totalTransaction={
-                MOCK_DATA.TRANSACTION.filter((tx) => tx.amount > 0).length
-              }
+              amount={stats.totalIncome}
+              totalTransaction={stats.incomeCount}
             />
             <StatGrid
               title="Net Worth"
-              amount={totalIncome - totalExpense}
-              totalTransaction={MOCK_DATA.TRANSACTION.length}
+              amount={stats.netWorth}
+              totalTransaction={data.transactions.length}
               className="col-span-2"
             />
           </div>
 
-          {/* Filter + Grouped Transactions */}
           <div className="w-full md:w-1/2 flex flex-col gap-4">
             <div className="inline-flex border rounded-xl p-1 gap-1 w-full">
               {(["all", "expense", "income"] as Filter[]).map((option) => (
@@ -235,7 +306,7 @@ export default function Home() {
                     {label}
                   </h2>
                   {transactions.map((options) => (
-                    <TransactionItem {...options} key={options.title} />
+                    <TransactionItem {...options} key={options.id ?? options.title} />
                   ))}
                 </section>
               ))}
@@ -252,3 +323,4 @@ export default function Home() {
     </div>
   );
 }
+

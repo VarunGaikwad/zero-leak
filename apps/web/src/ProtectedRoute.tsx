@@ -10,7 +10,6 @@ export default function ProtectedRoute({
   const [authed, setAuthed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    debugger;
     axiosInstance
       .get("/api/v1/me")
       .then(() => setAuthed(true))

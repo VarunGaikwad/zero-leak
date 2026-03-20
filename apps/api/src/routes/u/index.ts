@@ -18,10 +18,10 @@ router.post("/login", (req: Request, res: Response) => {
   }
 
   const token = jwt.sign(
-    JSON.stringify({
+    {
       name: "Varun Gaikwad",
       email: "c6b4o@example.com",
-    }),
+    },
     cookieSecret,
   );
   res.cookie("auth", token, {

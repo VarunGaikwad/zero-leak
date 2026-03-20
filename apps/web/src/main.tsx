@@ -13,6 +13,7 @@ import {
 } from "./pages";
 import Login from "./Login.tsx";
 import ProtectedRoute from "./ProtectedRoute.tsx";
+import { Provider } from "./model";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -23,7 +24,9 @@ createRoot(document.getElementById("root")!).render(
           path="/"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <Provider>
+                <Dashboard />
+              </Provider>
             </ProtectedRoute>
           }
         >

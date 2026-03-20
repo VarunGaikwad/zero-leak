@@ -1,6 +1,7 @@
-import { MOCK_DATA } from "@zeroleak/package/web/constant";
-import { ChevronDown, Repeat2 } from "lucide-react";
-import { useState } from "react";
+import { ChevronDown, Repeat2, HelpCircle, Trash2 } from "lucide-react";
+import * as Icons from "lucide-react";
+import { useEffect, useState, useMemo } from "react";
+import { axiosInstance } from "../lib";
 
 type TabType = "monthly" | "yearly" | "total";
 
@@ -35,16 +36,31 @@ function getAmountForTab(
   return amount; // total — as-is
 }
 
-const sortedSubscriptions = [...MOCK_DATA.SUBSCRIPTION].sort(
-  (a, b) => a.upcomingPayDate.getTime() - b.upcomingPayDate.getTime(),
-);
-
 export default function Subscriptions() {
   const [activeTab, setActiveTab] = useState<TabType>("monthly");
+  const [subscriptions, setSubscriptions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const totalDisplay = MOCK_DATA.SUBSCRIPTION.reduce((sum, sub) => {
-    return sum + getAmountForTab(sub.amount, sub.repeatUnit, activeTab);
-  }, 0);
+  useEffect(() => {
+    axiosInstance
+      .get("/api/v1/subscriptions")
+      .then((res) => setSubscriptions(res.data))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const sortedSubscriptions = useMemo(() => {
+    return [...subscriptions].sort(
+      (a, b) =>
+        new Date(a.upcomingPayDate).getTime() -
+        new Date(b.upcomingPayDate).getTime(),
+    );
+  }, [subscriptions]);
+
+  const totalDisplay = useMemo(() => {
+    return subscriptions.reduce((sum, sub) => {
+      return sum + getAmountForTab(sub.amount, sub.repeatUnit, activeTab);
+    }, 0);
+  }, [subscriptions, activeTab]);
 
   const tabLabel =
     activeTab === "monthly"
@@ -52,6 +68,20 @@ export default function Subscriptions() {
       : activeTab === "yearly"
         ? "Yearly"
         : "Total";
+
+  const getIcon = (name: string) => {
+    return (Icons as any)[name] || HelpCircle;
+  };
+
+  if (loading) {
+    return (
+      <div className="w-full py-20 text-center">
+        <p className="text-zinc-500 animate-pulse font-medium">
+          Loading subscriptions...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-5 mx-auto flex flex-col h-full">
@@ -88,7 +118,8 @@ export default function Subscriptions() {
 
         <ul className="space-y-10 mx-10 mt-6">
           {sortedSubscriptions.map((sub) => {
-            const IconComponent = sub.icon;
+            const IconComponent = getIcon(sub.icon);
+            const subDate = new Date(sub.upcomingPayDate);
             const displayAmount = getAmountForTab(
               sub.amount,
               sub.repeatUnit,
@@ -100,7 +131,7 @@ export default function Subscriptions() {
                 <article>
                   <header className="flex justify-between items-center mb-2">
                     <h2 className="text-lg font-semibold">
-                      {formatRelativeDate(sub.upcomingPayDate)}
+                      {formatRelativeDate(subDate)}
                     </h2>
                     <div className="flex flex-col items-end text-sm">
                       <span className="flex gap-2 items-center">
@@ -120,15 +151,31 @@ export default function Subscriptions() {
                       <IconComponent className="size-8 text-white" />
                     </div>
                     <p className="flex-1 font-medium">{sub.name}</p>
-                    <span className="flex items-center gap-3">
-                      {sub.upcomingPayDate >= new Date() && (
-                        <span className="text-sm">Pay?</span>
-                      )}
-                      <button className="flex items-center gap-1 font-semibold hover:bg-black/10 px-2 py-1 rounded-lg transition-colors">
-                        <ChevronDown className="size-4" />$
-                        {activeTab === "total" ? sub.amount : displayAmount}
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={async () => {
+                          if (window.confirm(`Delete subscription "${sub.name}"?`)) {
+                            await axiosInstance.delete(`/api/v1/subscriptions/${sub.id}`);
+                            setSubscriptions((prev) =>
+                              prev.filter((s) => s.id !== sub.id),
+                            );
+                          }
+                        }}
+                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors cursor-pointer"
+                        title="Delete subscription"
+                      >
+                        <Trash2 size={18} />
                       </button>
-                    </span>
+                      <span className="flex items-center gap-3">
+                        {subDate >= new Date() && (
+                          <span className="text-sm">Pay?</span>
+                        )}
+                        <button className="flex items-center gap-1 font-semibold hover:bg-black/10 px-2 py-1 rounded-lg transition-colors">
+                          <ChevronDown className="size-4" />$
+                          {activeTab === "total" ? sub.amount : displayAmount}
+                        </button>
+                      </span>
+                    </div>
                   </div>
                 </article>
               </li>
@@ -139,3 +186,4 @@ export default function Subscriptions() {
     </div>
   );
 }
+

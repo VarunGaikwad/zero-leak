@@ -33,7 +33,7 @@ export const MENU: MenuType[] = [
   { title: "Accounts", Icon: Landmark, link: "/account" },
 ];
 
-export const CURRENCY = ["¥", "$", "€"];
+export const CURRENCY = ["¥", "$", "€", "₹", "£", "₱", "฿", "₩", "R$", "zł", "₫", "₪"];
 
 export const MOCK_DATA = {
   CATEGORY: [

@@ -1,27 +1,35 @@
-import { ArrowDown, ArrowUp, NotepadText, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, NotepadText, HelpCircle, Trash2 } from "lucide-react";
+import * as Icons from "lucide-react";
 import { useState } from "react";
-import { MOCK_DATA } from "../constant";
 
 export default function TransactionItem({
   title,
   category,
   note,
   amount,
+  onDelete,
+  onClick,
 }: {
   title: string;
-  category: { title: string; isMain: boolean }[];
+  category: { title: string; isMain: boolean; icon?: string }[];
   note: string;
   amount: number;
+  onDelete?: () => void;
+  onClick?: () => void;
 }) {
   const [popoverOpen, setPopoverOpen] = useState(false);
 
-  const Icon = MOCK_DATA.CATEGORY.find(
-    ({ title }) => title === category.find(({ isMain }) => isMain)?.title,
-  )?.Icon as LucideIcon;
+  // Fallback to finding by name if icon isn't directly on category (mock data consistency)
+  const mainCat = category.find(({ isMain }) => isMain);
+  const iconName = mainCat?.icon;
+  const Icon = (Icons as any)[iconName as string] || HelpCircle;
 
   return (
-    <div className="flex gap-5 items-center">
-      <div className="bg-black p-2 rounded-full">
+    <div 
+      onClick={onClick}
+      className={`flex gap-5 items-center p-3 -mx-3 rounded-2xl transition-all ${onClick ? "hover:bg-gray-50 cursor-pointer" : ""}`}
+    >
+      <div className="bg-black p-2 rounded-full shrink-0">
         <Icon className="size-5 text-white" />
       </div>
       <div className="flex-1 min-w-0">
@@ -53,16 +61,28 @@ export default function TransactionItem({
             )}
           </div>
         )}
-        <span
-          className={`flex items-center ${amount >= 0 ? "text-green-500" : "text-red-500"}`}
-        >
-          {amount >= 0 ? (
-            <ArrowUp className="size-5" />
-          ) : (
-            <ArrowDown className="size-5" />
-          )}
-          <span className="font-semibold">${Math.abs(amount)}</span>
-        </span>
+        <div className="flex flex-col items-end gap-1">
+          <span
+            className={`flex items-center ${amount >= 0 ? "text-green-500" : "text-red-500"}`}
+          >
+            {amount >= 0 ? (
+              <ArrowUp className="size-5" />
+            ) : (
+              <ArrowDown className="size-5" />
+            )}
+            <span className="font-semibold">${Math.abs(amount)}</span>
+          </span>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete?.();
+            }}
+            className="p-1 px-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+            title="Delete transaction"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       </div>
     </div>
   );
